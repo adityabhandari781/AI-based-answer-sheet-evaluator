@@ -1,0 +1,60 @@
+Timeline:
+	initially thought bert would be able to handle it all
+	considered tf-idf vectorizing
+	decided to use spacy and use keyword detection method
+	wrote the preprocessing functions: remove_stops, remove_stops_lem, to_lower, remove_punct
+	went thru a research paper and decided to implement its functions
+	wrote its functions: summarize, bigram_similarity, synonym_similarity
+	summarize function felt ambiguous, so considering not to use it
+	if using summarize, first n_marks sentences can be considered
+	fuzzywuzzy may not be required
+	finalized synonym_similarity and bigram_similarity functions
+	averaging both similarities to get final similarity
+	decided to add weights (75% to synonym and 25% to bigram)
+	generated a dataset for testing similarities, and decided to give weights based on it
+	preprocessing to be done only on bigram function and not on synonym
+	decided to use word embeddings from SBERT and cosine similarity as a metric
+	context spelling correction is done
+	cant decide whether to add grammar correction
+	adding high weights to cosine similarity and low weights to bigram and synonym
+	made a new notebook, which is more organized and has all the main functions
+	added 3 context correction functions and a spelling correction function (this ones only for answers with few words)
+	comparing 2 sentences is done. now need to implement it for paragraphs
+	thought of using a paraphrase sentence transformer with cosine similarity, but decided it may not help in alloting marks
+	summarization felt unnecessary, hence decided to make an algorithm for comparing each sentence of each paragraph, and allot respective marks
+	got the chatgpt code for the above prompt
+	had to modify the code a bit
+	got a somewhat-ok accuracy for the pairs of answers i tested
+	converted the jupyter nb code to .py code
+	added an example.py file to show a test case
+	for now, might end it here
+	
+ChatGPT prompts:
+
+	algorithm to compare student answer with answer key:
+		get the student answer and answer key, and max_marks
+		preprocess the student answer and answer key
+		get the sentences from the student answer and answer key
+		cluster adjacent sentences of student answer by comparing similarities (their similarities should be greater than 0.5, to be clustered)
+		do the same with the answer key
+		number of clusters = max_marks
+		for each cluster in clusters of student answer
+			for each sentence in a cluster
+				compare the sentence with each sentence under answer key
+				get the sentence under answer key with maximum similarity, as well as its respective similarity value. add this pair to a dict
+			among all the pairs in dict get the sentence corresponding to the largest similarity value in it
+			now get the cluster associated with that sentence (let it be called key_cluster)
+			for each sentence in key_cluster compare each sentence with each sentence in the current student answer's cluster
+			average out the similarities we got and if this value in more than 0.5, add 1 mark to the total marks scored by student
+			remove all the sentences from the answer key which are under key_cluster
+		return the marks obtained
+
+
+
+	i have a list of sentences. i also have a function avg_similarity which calculates similarity bw 2 sentences. write a function taking the list of sentences, and an integer n as input, such that it calculates similarity bw 2 consecutive sentences, and divides them into n clusters, such that the sum of similarities bw each consecutive sentence in each cluster is maximized.
+	for eg: i have sentences [a,b,c,d,e], given n=3, and the consecutive similarities are calculated as [0.5,0.3,0.9,0.2]. they can be clustered as [(a,b),(c,d),(e)] as the similarity bw each consecutive sentence in every cluster is maximum
+
+
+
+	let me explain the example again:
+	we have sentences [a,b,c,d,e], n=3. calculated similarities are [0.5, 0.3, 0.9, 0.2]. for n clusters, we need to make (m-n) partitions (where m is number of sentences). hence we need to partition at points where the similarities are minimum. here m=5, n=3, so 2 partitions need to be made. clearly the 2 minimum similarities are 0.2 and 0.3, right? they correspond to the similarities of (d,e) and (b,c). so we partition the array at these points, giving the final result (a,b), (c,d), (e)
